@@ -1,3 +1,5 @@
+﻿/* @source: https://github.com/R0bur/drawing-actor/blob/main/script/i18n_en.js */
+/* @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later */
 /*============================*/
 /* Programming language tree. */
 /*============================*/
@@ -37,17 +39,17 @@ i18n.strTable.en = {
 	/*----------*/
 	/* index.js */
 	/*----------*/
-	/* Menu item and message about the Player is out of the drawing board. */
+	/* Menu item and message about the Actor is out of the drawing board. */
 	1: "reset",
-	2: "CRASH - Player is out of the board.",
+	2: "CRASH - Actor is out of the board.",
 	3: "Press [ESC] for the initial position.",
 	/* Mode №1 (interactive) title and messages. */
 	4: "Mode №1: Interactive.",
-	5: "Press [ESC] for the board cleaning.",
+	5: "Control the Actor using [F1], [F2] and [F3].\nPress [ESC] for the board cleaning.",
 	6: "Press [TAB] for the programming mode.",
 	/* Mode №2 (programming) title and messages. */
 	7: "Mode №2: Programming.",
-	8: "Press [ESC] for the program text erase.",
+	8: "Enter and modify the program.\nPress [ESC] for the program text erase.",
 	9: "Press [TAB] for the program execution mode.",
 	/* Mode №3 (program execution) title and messages. */
 	10: "Mode №3: Program execution.",
@@ -149,6 +151,8 @@ i18n.strTable.en = {
 	81: "Enter the packed task statement (empty line removes the current task).\nPaste from the clipboard: Ctrl+V, Enter.",
 	82: "Error: Can't unpack the task statement!",
 	83: "Here is a string with the packed task statement.\nCopy to the clipboard: Ctrl+C, Enter.",
+	/* Additional information line for the program execution mode. */
+	84: "Press [F1] to run program execution or [F5] to get fast result.",
 	/*------------*/
 	/* program.js */
 	/*------------*/
@@ -159,7 +163,7 @@ i18n.strTable.en = {
 	105: "end of branching",
 	106: "end of cycling",
 	107: "end of subroutine",
-	108: "The Player is crashed.",
+	108: "The Actor is crashed.",
 	109: "The nesting level is exceeded.",
 	110: "\"otherwise\" without preceding \"if\"",
 	111: "Another command.",
@@ -174,3 +178,4 @@ i18n.strTable.en = {
 	120: "Expected: ",
 	121: "No any error found."
 };
+/* @license-end */

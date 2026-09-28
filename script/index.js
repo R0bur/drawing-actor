@@ -1,8 +1,10 @@
-﻿/*================================================*/
-/* Графический исполнитель.                       */
-/* Автор: Игорь Сергеевич Орещенков, 2020-2023 г. */
-/* Язык программирования: JavaScript.             */
-/*================================================*/
+﻿/* @source: https://github.com/R0bur/drawing-actor/blob/main/script/index.js */
+/* @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later */
+/*======================================================*/
+/* Графический исполнитель.                             */
+/* Автор: Игорь Сергеевич Орещенков, 2020-2023, 2026 г. */
+/* Язык программирования: JavaScript.                   */
+/*======================================================*/
 /*=============================================*/
 /* Подготовка среды для выполнения приложения. */
 /*=============================================*/
@@ -185,7 +187,7 @@ function start ()
 	function afterMove ()
 	{
 		var actions = [{hotkey: "ESC", text: i18n.string (1), handler: doReset1}];
-		if (player.e) {
+		if (actor.e) {
 			/* Звуковое сопровождение ошибочной ситуации. */
 			app.soundPlay ("Fail");
 			/* Сообщение о возникшей ошибочной ситуации. */
@@ -200,7 +202,7 @@ function start ()
 	function doStep ()
 	{
 		disableUserInput ();
-		player.walk (true, afterMove, 0);
+		actor.walk (true, afterMove, 0);
 	}
 	/*---------------------------------*/
 	/* Выполнение прыжка исполнителем. */
@@ -208,7 +210,7 @@ function start ()
 	function doHop ()
 	{
 		disableUserInput ();
-		player.walk (false, afterMove, 0);
+		actor.walk (false, afterMove, 0);
 	}
 	/*-----------------------------------*/
 	/* Выполнение поворота исполнителем. */
@@ -216,7 +218,7 @@ function start ()
 	function doTurn ()
 	{
 		disableUserInput ();
-		player.turn (enableUserInput, 0);
+		actor.turn (enableUserInput, 0);
 	}
 	/*-------------------------------------------------------------------------*/
 	/* Возврат исполнителя в исходное состояние и очистка доски для рисования. */
@@ -224,16 +226,16 @@ function start ()
 	function doReset ()
 	{
 		app.soundPlay ("SwitchMode");
-		player.reset ();
+		actor.reset ();
 	}
 	function doReset1 ()
 	{
-		player.reset ();
+		actor.reset ();
 		switchMode1 ();
 	}
 	function doReset3 ()
 	{
-		player.reset ();
+		actor.reset ();
 		switchMode3 ();
 	}
 	/*------------------------------------------------*/
@@ -279,14 +281,14 @@ function start ()
 	/*----------------------------------------*/
 	function switchMode3 () {
 		app.soundPlay ("SwitchMode");
-		switchMode (elemMenubar, 2, false, i18n.string (10), i18n.string (11));
+		switchMode (elemMenubar, 2, false, i18n.string (10), i18n.string (84) + "\n" + i18n.string (3) + "\n" + i18n.string (11));
 	}
 	/*---------------------------------------------------*/
 	/* Запуск программы на исполнение.                   */
 	/* Вызов: mode - режим выполнения программы,         */
-	/*        0 - обычный, 1 - результат, 2 - отладка,   */
-	/*        3 - продолжение выполнения после отладки,  */
-	/*        4 - переход в режим отладки из выполнения. */
+	/*        1 - обычный, 2 - результат, 3 - отладка,   */
+	/*        4 - продолжение выполнения после отладки,  */
+	/*        5 - переход в режим отладки из выполнения. */
 	/*---------------------------------------------------*/
 	function prgStart (mode)
 	{
@@ -314,7 +316,7 @@ function start ()
 			else {
 				if (task.isset ()) {
 					/* Проверка правильности решения задачи. */
-					res = task.check (boardmap.m, player.c, player.r, player.d);
+					res = task.check (boardmap.m, actor.c, actor.r, actor.d);
 					lines = new Array ();
 					if (res.n1 != 0)
 						lines.push (" - " + i18n.string (78, res.n1));
@@ -324,7 +326,7 @@ function start ()
 						lines.push (" - " + i18n.string (80));
 					if (lines.length == 0) {
 						/* Приведение внешнего вида указателя в соотвтетствие с успешным выполнением задания. */
-						boardptr.view (player.d, 5, 1);
+						boardptr.view (actor.d, 5, 1);
 						/* Звуковое сопровождение успешного выполнения задания. */
 						app.soundPlay ("Success");
 						/* Подготовка информации о результате выполнения программы. */
@@ -359,6 +361,7 @@ function start ()
 			}
 			/* Отображение информации о результате выполнения программы. */
 			switchMode (elemMenubar, 2, false, "", msg);
+			program.mode = 0;	/* Программа перешла в состояние "не выполняется". */
 		}
 		/*----------------------------------*/
 		/* Прерывание выполнения программы. */
@@ -378,21 +381,23 @@ function start ()
 		/*---------------------------------------------------------*/
 		function prgDebug () {
 			program.turnDebugOn ();
-			prgStart (4);
+			prgStart (5);
 		}
 		/*---------------------------------------------------*/
 		/* Прерывание выполнения программы в режиме отладки. */
 		/*---------------------------------------------------*/
 		function dbgBreak ()
 		{
+			app.soundPlay ("Fail");
 			switchMode (elemMenubar, 2, false, "", i18n.string (17));
+			program.mode = 0;
 		}
 		/*---------------------------------------------------------------------*/
 		/* Переход из режима отладки в режим нормального выполнения программы. */
 		/*---------------------------------------------------------------------*/
 		function dbgContinue ()
 		{
-			prgStart (3);
+			prgStart (4);
 		}
 		/*------------------------------------------------*/
 		/* Выполнение очередной команды в режиме отладки. */
@@ -406,12 +411,12 @@ function start ()
 		/* В режиме решения задачи перед запуском программы любым способом */
 		/* осуществляется сброс обстановки в исходное состояние.           */
 		/*-----------------------------------------------------------------*/
-		if (mode < 3 && task.isset ())
+		if (mode < 4 && task.isset ())
 			doReset ();
 		/*--------------------------------------------*/
 		/* Настройка доступных пользователю действий. */
 		/*--------------------------------------------*/
-		if (mode != 2 && mode != 4) {
+		if (mode != 3 && mode != 5) {
 			actions = [
 				{hotkey: "F1", text: i18n.string (18), handler: prgBreak},
 				{hotkey: "F2", text: i18n.string (19), handler: prgDebug},
@@ -428,11 +433,10 @@ function start ()
 		}
 		menubar.replace (actions);
 		bulletin.placeInfo (msg);
-		
-		tmStart = mode == 0? getCurrentSeconds (): 0;
-		if (mode < 3)
+		tmStart = mode == 1? getCurrentSeconds (): 0;
+		if (mode < 4)
 			program.start (mode, prgDone);
-		else if (mode == 3)
+		else if (mode == 4)
 			program.continueExecution (prgDone);
 	}
 	/*----------------------------------------*/
@@ -440,21 +444,21 @@ function start ()
 	/*----------------------------------------*/
 	function prgStartNormal ()
 	{
-		prgStart (0);
+		prgStart (1);
 	}
 	/*--------------------------------------------------*/
 	/* Отладка программы (режим пошагового выполнения). */
 	/*--------------------------------------------------*/
 	function prgDebug ()
 	{
-		prgStart (2);
+		prgStart (3);
 	}
 	/*-----------------------------------------------------------*/
 	/* Получение окончательного результата выполнения программы. */
 	/*-----------------------------------------------------------*/
 	function prgFinalResult ()
 	{
-		prgStart (1);
+		prgStart (2);
 	}
 	/*------------------------*/
 	/* Ввод команды "прыжок". */
@@ -633,9 +637,9 @@ function start ()
 	/*--------------------------------------------------------------------------*/
 	function wndResize ()
 	{
-		player.display (false);
+		actor.display (false);
 		boardptr.windowresize ();
-		player.display (true);
+		actor.display (true);
 	}
 	/*-------------------------------------------*/
 	/* Установка обработчика нажатий на клавиши. */
@@ -645,26 +649,34 @@ function start ()
 		var reFKeys = /^F(?:[1-9]|1[012])$/, body = document.getElementsByTagName ("body")[0];
 		/* Установка обработчика событий от клавиатуры. */
 		body.onkeydown = function (event) {
+			if (event.key == "Alt" || event.key == "Control" || event.key == "Shift")
+				return false;
 			var result = !reFKeys.test (event.key), i, key = event.key.substring (0, 3).toUpperCase ();
 			/* Обработка привязок к пунктам горизонтального меню. */
 			for (i in menubar.items)
-				if (key == menubar.items[i].hotkey) {
+				if (!event.altKey && !event.shiftKey && !event.ctrlKey && key == menubar.items[i].hotkey) {
 					if (app.userinput)
 						menubar.items[i].handler ();
 					result = false;
 					break;
 				}
-			/* Обработка других привязок. */
-			if (app.userinput) {
+			/* Обработка других привязок, если разрешён пользовательский ввод и программа не выполняется. */
+			if (app.userinput && program.mode == 0) {
 				if (result && event.code == "KeyA" && event.altKey && !event.shiftKey && !event.ctrlKey) {
 					/* Отображение информации о продукте и авторе. */
 					displayAboutBox ();
 					result = false;
 				}
-				if (app.mode == 0) {
+				switch (app.mode) {
+				case 0: 
+					if (result && key == "TAB" && !event.altKey && event.shiftKey && !event.ctrlKey) {
+						/* Переход к предыдущему режиму. */
+						switchMode3 ();
+						result = false;
+					}
 					if (result && event.code == "KeyH" && event.altKey && !event.shiftKey && !event.ctrlKey) {
 						/* Использование текущей позиции исполнителя в качестве начальной. */
-						player.home ();
+						actor.home ();
 						result = false;
 					}
 					if (result && event.code == "KeyT" && event.altKey && !event.shiftKey && !event.ctrlKey) {
@@ -672,13 +684,26 @@ function start ()
 						getCurrentSituation ();
 						result = false;
 					}
-				}
-				if (app.mode == 1)
+					break;
+				case 1:
+					if (result && key == "TAB" && !event.altKey && event.shiftKey && !event.ctrlKey) {
+						/* Переход к предыдущему режиму. */
+						switchMode1 ();
+						result = false;
+					}
 					if (result && event.code == "KeyT" && event.altKey && !event.shiftKey && !event.ctrlKey) {
 						/* Переключение на сценарий решения задачи. */
 						taskSolvingMode ();
 						result = flase;
 					}
+					break;
+				case 2:
+					if (result && key == "TAB" && !event.altKey && event.shiftKey && !event.ctrlKey) {
+						/* Переход к предыдущему режиму. */
+						switchMode2 ();
+						result = false;
+					}
+				}
 			}
 			if (result && event.code == "KeyS" && event.altKey && !event.shiftKey && !event.ctrlKey) {
 				/* Включение/выключение звукового сопровождения. */
@@ -747,14 +772,14 @@ function start ()
 		if (s != null)
 			if (s.length > 0)
 				if (task.unpack (s, app.abc)) {
-					player.setHome (task.c0, task.r0, task.d0);
+					actor.setHome (task.c0, task.r0, task.d0);
 					doReset ();
 				}
 				else
 					window.alert (i18n.string (82));
 			else {
 				task.remove ();
-				player.setHome (0, 0, 0);
+				actor.setHome (0, 0, 0);
 				doReset ();
 			}
 		enableUserInput ();
@@ -766,9 +791,9 @@ function start ()
 	{
 		var start, map, finish, abc = app.abc, s;
 		disableUserInput ();
-		start = abc.charAt (player.c0) + abc.charAt (player.r0) + abc.charAt (player.d0);
+		start = abc.charAt (actor.c0) + abc.charAt (actor.r0) + abc.charAt (actor.d0);
 		map = boardmap.pack (app.abc);
-		finish = abc.charAt (player.c) + abc.charAt (player.r) + abc.charAt (player.d);
+		finish = abc.charAt (actor.c) + abc.charAt (actor.r) + abc.charAt (actor.d);
 		s = start + map + finish;
 		window.prompt (i18n.string (83), s);
 		enableUserInput ();
@@ -817,12 +842,12 @@ function start ()
 	];
 	app.abc = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-=";
 	disableUserInput ();
-	player.init (16, 20);
+	actor.init (16, 20);
 	boardmap.init (16, 20);
 	task.init (16, 20);
 	if (typeof (app.task) == "string" && app.task.length > 0)
 		if (task.unpack (app.task, app.abc))
-			player.setHome (task.c0, task.r0, task.d0);
+			actor.setHome (task.c0, task.r0, task.d0);
 		else
 			window.alert ("Error: Can't unpack the task statement!");
 	menubar.init (document.getElementById ("menubar"));
@@ -830,8 +855,7 @@ function start ()
 	boardptr.init (board, "img/sprite.gif", 24, 24);
 	editor.init (document.getElementById ("editor").firstChild);
 	bulletin.init (document.getElementById ("bulletin"));
-	player.reset ();
-	/* createMenubar (document.getElementById ("menubar"), app.modes[app.mode]); */
+	actor.reset ();
 	switch (app.mode) {
 		case 1: switchMode2 ();
 			break;
@@ -849,3 +873,4 @@ function start ()
 	if (app.mode == 1)
 		editor.elem.focus ();
 }
+/* @license-end */

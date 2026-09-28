@@ -1,3 +1,5 @@
+﻿/* @source: https://github.com/R0bur/drawing-actor/blob/main/script/sprite.js */
+/* @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later */
 /*====================================================*/
 /* Конструктор объекта "Спрайт".                      */
 /* Вызов: src - путь к файлу с изображением,          */
@@ -89,3 +91,4 @@ Sprite.prototype.moveImageBy = function (dx, dy)
 Sprite.prototype.show = function (mode) {
 	this.elem.style.visibility = mode? "visible": "hidden";
 };
+/* @license-end */

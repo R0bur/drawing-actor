@@ -1,4 +1,6 @@
-﻿/*======================*/
+﻿/* @source: https://github.com/R0bur/drawing-actor/blob/main/script/board.js */
+/* @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later */
+/*======================*/
 /* Доска для рисования. */
 /*======================*/
 var board = new Object ();
@@ -48,7 +50,7 @@ board.wash = function () {
 	context.lineWidth = this.w;
 	context.beginPath ();
 	/* Очистка доски. */
-	context.clearRect (0, 0, this.elem.width - 1, this.elem.height - 1);
+	context.clearRect (0, 0, this.elem.width, this.elem.height);
 	/* Рисование горизонтальных линий сетки. */
 	dw = 0.5 * this.w;
 	y1 = y2 = this.sy - dw;
@@ -120,3 +122,4 @@ board.drawTask = function (map, c, r, dc, dr) {
 	context.arc (x1 + 0.5 * dc * this.sx, y1 + 0.5 * dr * this.sy, 0.2 * 0.5 * (this.sx + this.sy), 0, 2 * Math.PI);
 	context.stroke ();
 }
+/* @license-end */

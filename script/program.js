@@ -1,4 +1,6 @@
-﻿/*=====================*/
+﻿/* @source: https://github.com/R0bur/drawing-actor/blob/main/script/program.js */
+/* @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later */
+/*=====================*/
 /* Объект - программа. */
 /*=====================*/
 var program = new Object ();
@@ -6,6 +8,7 @@ var program = new Object ();
 /* Дерево языка программирования. */
 /*================================*/
 program.language = null;	/* дерево определяется в соответствии с языком интерфейса */
+program.mode = 0;		/* программа не выполняется */
 /*==================================================================*/
 /* Интерпретация строки программы.                                  */
 /* Обрабатывается строка this.atext[this.ip].                       */
@@ -95,7 +98,7 @@ program.interpretate = function () {
 /*======================================================*/
 /* Метод объекта "программа" - начало исполнения.       */
 /* Вызов: mode - режим выполнения программы,            */
-/*        0 - обычный, 1 - результат, 2 - отладка,      */
+/*        1 - обычный, 2 - результат, 3 - отладка,      */
 /*        done - функция, которая должна быть выполнена */
 /*               по завершении программы.               */
 /*======================================================*/
@@ -126,15 +129,15 @@ program.start = function (mode, done)
 	this.active = true;		/* признак необходимости выполнения команд */
 	this.npass = 0;			/* количество повторных рассмотрений команды */
 	/* Выключение отображения исполнителя в быстром режиме. */
-	if (mode == 1)
-		player.display (false);
+	if (mode == 2)
+		actor.display (false);
 	/* Запуск процесса выполнения программы с первой команды. */
 	if (this.ip < this.atext.length) {
 		/* Подсвечивание очередной строки в редакторе. */
-		if (this.active && this.mode != 1)
+		if (this.active && this.mode != 2)
 			editor.selectLine (this.ip, this.atext.length);
 		/* Выполнение первой команды. */
-		if (this.mode != 2)
+		if (this.mode != 3)
 			this.executeCommand (done);
 	}
 	else
@@ -176,8 +179,8 @@ program.executeCommand = function (done, imdone)
 			o.ip++;
 		}
 		/* Восстановление отображения исполнителя в быстром режиме. */
-		if (o.mode == 1)
-			player.display (true);
+		if (o.mode == 2)
+			actor.display (true);
 		/* Выполнение функции завершения. */
 		done ();
 	}
@@ -189,7 +192,7 @@ program.executeCommand = function (done, imdone)
 	/*--------------------------------------------*/
 	function planNextCommand () {
 		/* Проверка состояния исполнителя. */
-		if (player.e)
+		if (actor.e)
 			o.error = {
 				message: i18n.string (108),
 				found: "",
@@ -200,11 +203,11 @@ program.executeCommand = function (done, imdone)
 		if (!o.error && o.ip < o.atext.length - 1) {
 			o.ip++;
 			/* Подсвечивание очередной строки программы в редакторе. */
-			if (o.active && o.mode != 1)
+			if (o.active && o.mode != 2)
 				editor.selectLine (o.ip, o.atext.length);
 			/* Планирование выполнения очередной строки программы. */
-			if (!o.active || o.mode != 2)
-				setTimeout (function () { o.executeCommand (done, imdone); }, o.active && o.mode == 0? o.timeout: 1);
+			if (!o.active || o.mode != 3)
+				setTimeout (function () { o.executeCommand (done, imdone); }, o.active && o.mode == 1? o.timeout: 1);
 			else if (imdone)
 				imdone ();
 		}
@@ -219,12 +222,12 @@ program.executeCommand = function (done, imdone)
 		switch (this.command.code) {
 		case -1: /* прыжок */
 			if (this.active) {
-				if (this.mode == 1)
+				if (this.mode == 2)
 					/* Быстрый режим выполнения. */
-					player.quickWalk (false, planNextCommand);
+					actor.quickWalk (false, planNextCommand);
 				else
 					/* Обычный режим выполнения или режим отладки. */
-					player.walk (false, planNextCommand, 0);
+					actor.walk (false, planNextCommand, 0);
 				/* Учёт выполненного прыжка. */
 				this.counters[0]++;
 				nextCommandIsScheduled = true;
@@ -232,12 +235,12 @@ program.executeCommand = function (done, imdone)
 			break;
 		case -2: /* шаг */
 			if (this.active) {
-				if (this.mode == 1)
+				if (this.mode == 2)
 					/* Быстрый режим выполнения. */
-					player.quickWalk (true, planNextCommand);
+					actor.quickWalk (true, planNextCommand);
 				else
 					/* Обычный режим выполнения или режим отладки. */
-					player.walk (true, planNextCommand, 0);
+					actor.walk (true, planNextCommand, 0);
 				/* Учёт выполненного шага. */
 				this.counters[1]++;
 				nextCommandIsScheduled = true;
@@ -245,12 +248,12 @@ program.executeCommand = function (done, imdone)
 			break;
 		case -3: /* поворот */
 			if (this.active) {
-				if (this.mode == 1)
+				if (this.mode == 2)
 					/* Быстрый режим выполнения. */
-					player.quickTurn (planNextCommand);
+					actor.quickTurn (planNextCommand);
 				else
 					/* Обычный режим выполнения или режим отладки. */
-					player.turn (planNextCommand, 0);
+					actor.turn (planNextCommand, 0);
 				/* Учёт выполненного поворота. */
 				this.counters[2]++;
 				nextCommandIsScheduled = true;
@@ -263,9 +266,9 @@ program.executeCommand = function (done, imdone)
 			if (this.stack.length < this.stackCapacity) {
 				this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
 				if (this.active) {
-					this.active = this.command.code == 1 || this.command.code == 4? player.queryEdgeAhead ():
-						!player.queryEdgeAhead ();
-					if (this.mode != 1) {
+					this.active = this.command.code == 1 || this.command.code == 4? actor.queryEdgeAhead ():
+						!actor.queryEdgeAhead ();
+					if (this.mode != 2) {
 						/* Звуковое сопровождение результата проверки в обычном режиме выполнения или в режиме отладки. */
 						app.soundPlay (this.active? "True": "False");
 						/* Демонстрация результата проверки в обычном режиме выполнения или в режиме отладки. */
@@ -284,52 +287,58 @@ program.executeCommand = function (done, imdone)
 				};
 			break;
 		case 3: /* иначе */
-			topOfStack = this.stack.length? this.stack[this.stack.length - 1]: null;
-			if (topOfStack && (topOfStack.code == 1 || topOfStack.code == 2)) {
-				/* Изменение состояния активности, если вход в команду ветвления */
-				/* был выполнен в активном состоянии.                            */
-				if (topOfStack.active) {
-					if (this.mode != 1) {
-						if (this.active) {
-							/* Определение реального состояния активности, которое должно быть */
-							/* установлено после выполнения рассматриваемой команды. */
-							this.active = this.npass > 0;
-							this.npass = 0;
-							/* Звуковое сопровождение инверсии результата проверки в обычном режиме выполнения или в режиме отладки. */
-							app.soundPlay (this.active? "True": "False");
-							/* Демонстрация инверсии результата проверки в обычном режиме или в режиме отладки. */
-							editor.flashSelection (this.active? 1: 2, o.timeout, planNextCommand);
-							nextCommandIsScheduled = true;
-						}
-						else {
-							/* Включение состояния активности потока выполнения и направление на второй проход. */
-							this.active = true;
-							this.npass = 1;
-							this.ip--;
-						}
-					}
-					else
-						/* В быстром режиме - просто изменение состояния активности потока выполнения. */
+			if (this.npass == 0) {
+				topOfStack = this.stack.length? this.stack[this.stack.length - 1]: null;
+				if (topOfStack && (topOfStack.code == 1 || topOfStack.code == 2)) {
+					/* Изменение состояния активности, если вход в команду ветвления */
+					/* был выполнен в активном состоянии.                            */
+					if (topOfStack.active) {
 						this.active = !this.active;
+						/* В режимах обычного выполнения и отладки - звуковизуальное сопровождение выполения команды. */
+						if (this.mode != 2)
+							if (!this.active) {
+								/* Состояние потока выполнения изменено с активного на пассивное. */
+								/* Звуковое сопровождение инверсии результата проверки в обычном режиме выполнения или в режиме отладки. */
+								app.soundPlay ("False");
+								/* Демонстрация инверсии результата проверки в обычном режиме или в режиме отладки. */
+								editor.flashSelection (2, o.timeout, planNextCommand);
+								nextCommandIsScheduled = true;
+							}
+							else {
+								/* Состояние потока изменено с пассивного на активное. */			
+								/* Направление на второй проход. */
+								this.npass = 1;
+								this.ip--;
+							}
+
+					}
 				}
+				else
+					/* Ошибка: "иначе" без соответствующего "если". */
+					this.error = {
+						message: i18n.string (103),
+						found: i18n.string (110),
+						expected: i18n.string (111),
+						position: 0
+					};
 			}
-			else
-				/* Ошибка: "иначе" без соответствующего "если". */
-				this.error = {
-					message: i18n.string (103),
-					found: i18n.string (110),
-					expected: i18n.string (111),
-					position: 0
-				};
+			else {
+				/* Второй проход после активирования потока выполнения в результате выполнения обрабатываемой команды */
+				/* предназначен только для визуализации и не требует других действий. */
+				this.npass = 0;
+				app.soundPlay ("True");
+				editor.flashSelection (1, o.timeout, planNextCommand);
+				nextCommandIsScheduled = true;
+			}
 			break;
 		case 6: /* конец ветвления */
 			if (this.npass == 0) {
 				topOfStack = this.stack.pop ();
 				if (topOfStack && (topOfStack.code == 1 || topOfStack.code == 2))
-					if (topOfStack.active && this.mode != 1) {
-						/* Звуковое сопровождение завершения блока ветвления в обычном режиме или режиме отладки. */
-						app.soundPlay ("Neutral");
+					if (topOfStack.active && this.mode != 2) {
 						if (this.active) {
+							/* Звуковое сопровождение завершения блока ветвления в обычном режиме или режиме отладки. */
+							app.soundPlay ("Neutral");
 							/* Обозначение завершения блока ветвления в обычном режиме или режиме отладки. */
 							editor.flashSelection (0, o.timeout, planNextCommand);
 							nextCommandIsScheduled = true;
@@ -342,7 +351,7 @@ program.executeCommand = function (done, imdone)
 						}
 					}
 					else
-						/* В режиме быстрого выполдения или когда ветвление пропускается */
+						/* В режиме быстрого выполнения или когда ветвление пропускается */
 						/* просто обновляется признак активности выполнения программы. */
 						this.active = topOfStack.active;
 				else
@@ -357,35 +366,56 @@ program.executeCommand = function (done, imdone)
 			else {
 				/* Сброс счётчика проходов. */
 				this.npass = 0;
+				/* Звуковое сопровождение завершения блока ветвления в обычном режиме или режиме отладки. */
+				app.soundPlay ("Neutral");
 				/* Обозначение завершения блока ветвления. */
 				editor.flashSelection (0, o.timeout, planNextCommand);
 				nextCommandIsScheduled = true;
 			}
 			break;
 		case 7: /* конец цикла */
-			topOfStack = this.stack.pop ();
-			if (topOfStack && (topOfStack.code == 4 || topOfStack.code == 5))
-				if (this.active) {
-					/* Установка начала цикла в качестве очередной команды. */
-					this.ip = topOfStack.ip - 1;
-					if (this.mode != 1) {
-						/* Звуковое сопровождение конца цикла в обычном режиме или режиме отладки. */
-						app.soundPlay ("Back");
-						/* Демонстрация завершения конца цикла в обычном режиме или режиме отладки. */
-						editor.flashSelection (0, o.timeout, planNextCommand);
-						nextCommandIsScheduled = true;
+			if (this.npass == 0) {
+				topOfStack = this.stack.pop ();
+				if (topOfStack && (topOfStack.code == 4 || topOfStack.code == 5)) {
+					if (this.active) {
+						/* Установка начала цикла в качестве очередной команды. */
+						this.ip = topOfStack.ip - 1;
+						if (this.mode != 2) {
+							/* Звуковое сопровождение конца цикла в обычном режиме или режиме отладки. */
+							app.soundPlay ("Back");
+							/* Демонстрация завершения конца цикла в обычном режиме или режиме отладки. */
+							editor.flashSelection (0, o.timeout, planNextCommand);
+							nextCommandIsScheduled = true;
+						}
+					}
+					else {
+						this.active = topOfStack.active;
+						if (this.active && this.mode != 2) {
+							/* Направление на второй проход в обычном режиме или режиме отладки. */
+							this.npass = 1;
+							this.ip--;
+						}
 					}
 				}
 				else
-					this.active = topOfStack.active;
-			else
-				/* Ошибка: "конец цикла" без соответствующего "пока". */
-				this.error = {
-					message: i18n.string (103),
-					found: i18n.string (113),
-					expected: i18n.string (111),
-					position: 0
-				};
+					/* Ошибка: "конец цикла" без соответствующего "пока". */
+					this.error = {
+						message: i18n.string (103),
+						found: i18n.string (113),
+						expected: i18n.string (111),
+						position: 0
+					};
+			}
+			else {
+				/* Второй проход - исключительно для демонстрации визуальных эффектов */
+				/* после перехода из пассивного режима выполнения в активный. */
+				/* Сброс счётчика проходов. */
+				this.npass = 0;
+				/* Обозначение конца цикла. */
+				app.soundPlay ("Neutral");
+				editor.flashSelection (0, o.timeout, planNextCommand);
+				nextCommandIsScheduled = true;
+			}
 			break;
 		case 8: /* конец процедуры */
 			topOfStack = this.stack.pop ();
@@ -397,7 +427,7 @@ program.executeCommand = function (done, imdone)
 					/*     Возврат после завершения выполнения процедуры   */
 					/* ("сделай" помещается в стек только в активном режиме) */
 					this.ip = topOfStack.ip;
-					if (this.mode != 1) {
+					if (this.mode != 2) {
 						/* Звуковое сопровождение конца процедуры в обычном режиме или режиме отладки. */
 						app.soundPlay ("Back");
 						/* Демонстрация конца процедуры в обычном режиме или режиме отладки. */
@@ -433,7 +463,7 @@ program.executeCommand = function (done, imdone)
 			else {
 				/* Сброс признака перехода по команде "сделай". */
 				this.npass = 0;
-				if (this.mode != 1) {
+				if (this.mode != 2) {
 					/* Звуковое сопровождение начала выполнения процедуры в обычном режиме или режиме отладки. */
 					app.soundPlay ("Neutral");
 					/* Демонстрация начала выполнения процедуры в обычном режиме или режиме отладки. */
@@ -450,7 +480,7 @@ program.executeCommand = function (done, imdone)
 						this.ip = this.proc[this.command.args[0]] - 1;
 						/* Установка признака перехода по команде "сделай". */
 						this.npass = 1;
-						if (this.mode != 1) {
+						if (this.mode != 2) {
 							/* Звуковое сопровождение начала выполнения процедуры в обычном режиме или режиме отладки. */
 							app.soundPlay ("Into");
 							/* Демонстрация выполнения команды вызова подпрограммы в обычном режиме или режиме отладки. */
@@ -490,10 +520,10 @@ program.executeCommand = function (done, imdone)
 /*====================================*/
 program.turnDebugOn = function ()
 {
-	if (this.mode == 1)
+	if (this.mode == 2)
 		/* Включение отображения исполнителя после быстрого режима. */
-		player.display (true);
-	this.mode = 2;
+		actor.display (true);
+	this.mode = 3;
 }
 /*================================================================*/
 /* Продолжение выполнения программы после прерывания.             */
@@ -501,7 +531,7 @@ program.turnDebugOn = function ()
 /*================================================================*/
 program.continueExecution = function (done)
 {
-	this.mode = 0;
+	this.mode = 1;
 	this.executeCommand (done);
 }
 /*=============================================*/
@@ -522,3 +552,4 @@ program.getErrorMessage = function () {
 		s = i18n.string (121);
 	return s;
 };
+/* @license-end */

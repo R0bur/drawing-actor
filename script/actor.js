@@ -1,13 +1,15 @@
-﻿/*=======================*/
+﻿/* @source: https://github.com/R0bur/drawing-actor/blob/main/script/actor.js */
+/* @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later */
+/*=======================*/
 /* Объект "Исполнитель". */
 /*=======================*/
-var player = new Object ();
+var actor = new Object ();
 /*==================================*/
 /* Подготовка исполнителя к работе. */
 /* Вызов: nc - количество столбцов, */
 /*        nr - количество строк.    */
 /*==================================*/
-player.init = function (nc, nr)
+actor.init = function (nc, nr)
 {
 	this.directions = [{dc: 1, dr: 0}, {dc: 0, dr: -1}, {dc: -1, dr: 0}, {dc: 0, dr: 1}];
 	this.c0 = 0;		/* начальный столбец */
@@ -22,7 +24,7 @@ player.init = function (nc, nr)
 /* Вызов: f - признак отображения:           */
 /*        true - отобразить, false - скрыть. */
 /*===========================================*/
-player.display = function (f)
+actor.display = function (f)
 {
 	/* Перед отображением указатель размещается в нужной позиции и фазе действия.*/
 	if (f) {
@@ -34,7 +36,7 @@ player.display = function (f)
 /*===========================================*/
 /* Возврат исполнителя в исходное положение. */
 /*===========================================*/
-player.reset = function ()
+actor.reset = function ()
 {
 	this.c = this.c0;	/* столбец */
 	this.r = this.r0;	/* строка */
@@ -50,7 +52,7 @@ player.reset = function ()
 /*=================================================================*/
 /* Использование текущей позиции исполнителя в качестве начальной. */
 /*=================================================================*/
-player.home = function ()
+actor.home = function ()
 {
 	this.c0 = this.c;
 	this.r0 = this.r;
@@ -63,7 +65,7 @@ player.home = function ()
 /*        r - начальная строка,            */
 /*        d - начальное направление.       */
 /*=========================================*/
-player.setHome = function (c, r, d)
+actor.setHome = function (c, r, d)
 {
 	this.c0 = c;
 	this.r0 = r;
@@ -75,7 +77,7 @@ player.setHome = function (c, r, d)
 /*        done - функция, вызываемая по завершении,    */
 /*        phase - фаза перемещения.                    */
 /*=====================================================*/
-player.walk = function (drawing, done, phase)
+actor.walk = function (drawing, done, phase)
 {
 	var newC, newR, o, nph = 4, k;
 	newC = this.c + this.directions[this.d].dc;
@@ -120,7 +122,7 @@ player.walk = function (drawing, done, phase)
 /* Вызов: done - функция, вызываемая по завершении, */
 /*        phase - фаза поворота.                    */
 /*==================================================*/
-player.turn = function (done, phase)
+actor.turn = function (done, phase)
 {
 	var o, d1, d2, nph = 4;
 	/* Выполнение фазы поворота исполнителя. */
@@ -154,7 +156,7 @@ player.turn = function (done, phase)
 /* Вызов: drawing - признак рисования при перемещении,    */
 /*        done - функция, вызываемая по завершении.       */
 /*========================================================*/
-player.quickWalk = function (drawing, done) {
+actor.quickWalk = function (drawing, done) {
 	var newC, newR;
 	/* Вычисление новых координат. */
 	newC = this.c + this.directions[this.d].dc;
@@ -177,7 +179,7 @@ player.quickWalk = function (drawing, done) {
 /*==============================*/
 /* Быстрый поворот исполнителя. */
 /*==============================*/
-player.quickTurn = function (done) {
+actor.quickTurn = function (done) {
 	if (!this.e)
 		this.d = (this.d + 1) % this.directions.length;
 	done ();
@@ -187,7 +189,7 @@ player.quickTurn = function (done) {
 /* Возврат: true - впереди край,              */
 /*          false - впереди не край.          */
 /*============================================*/
-player.queryEdgeAhead = function ()
+actor.queryEdgeAhead = function ()
 {
 	var r1 = this.r + this.directions[this.d].dr,
 	c1 = this.c + this.directions[this.d].dc;
@@ -196,7 +198,8 @@ player.queryEdgeAhead = function ()
 /*===================================================*/
 /* Информация о состоянии исполнителя в виде строки. */
 /*===================================================*/
-player.toString = function ()
+actor.toString = function ()
 {
 	return "(" + this.c + "," + this.r + ") -> " + this.d + " [" + (this.e? "Ошибка": "Ок") + "]";
 }
+/* @license-end */

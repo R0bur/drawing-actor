@@ -24,6 +24,32 @@ i18n.plTree.en = {
 	"subroutine": {"!name": 9},
 	"do": {"!name": 10}
 };
+/*====================================================*/
+/* Menu items with commands for the programming mode. */
+/*====================================================*/
+i18n.edTree.en = {
+	"F1": "hop^hop.",
+	"F2": "step^step.",
+	"F3": "turn^turn.",
+	"F4": ["…^ ", {
+		"F4": ["if…^if ", {
+			"F1": "…it can't move forward^it can't move forward then.",
+			"F2": "…it can move forward^it can move forward then."
+		}],
+		"F5": "otherwise^otherwise.",
+		"F6": ["while…^while ", {
+			"F1": "…it can't move forward^it can't move forward repeat.",
+			"F2": "…it can move forward^it can move forward repeat."
+		}],
+		"F7": "do^do ",
+		"F8": "subroutine^subroutine ",
+		"F9": ["end of…^the end of ", {
+			"F1": "…branching^branching.",
+			"F2": "…cycling^cycling.",
+			"F3": "…subroutine^subroutine."
+		}]
+	}]
+};
 /*================*/
 /* Strings table. */
 /*================*/
@@ -31,11 +57,8 @@ i18n.strTable.en = {
 	/*-----------*/
 	/* index.html*/
 	/*-----------*/
-	1000: "The Actor «Ladybug»",
-	1001: "Ihar S. Areshchankau",
-	1002: "Application: ",
-	1003: "version: ",
-	1004: "Developed by: ",
+	1000: "Ladybug Environment",
+	1001: "%1. Version %2.",
 	/*----------*/
 	/* index.js */
 	/*----------*/
@@ -74,45 +97,7 @@ i18n.strTable.en = {
 	23: "execute",
 	/* Message about program debugging mode switches on. */
 	24: "The program is being debugged…",
-	/* Text for input to the editor by menu items "hop", "step" and "turn". */
-	25: "hop",
-	26: "step",
-	27: "turn",
-	/* Text for input to the editor for clarification "if" menu item. */
-	28: "it can't move forward then",
-	29: "it can move forward then",
-	/* Menu items of the "if" clarification submode. */
-	30: "…it can't move forward",
-	31: "…it can move forward",
-	/* Text for input to the editor by menu items "if" and "otherwise". */
-	32: "if ",
-	33: "otherwise",
-	/* Text for input to the editor for clarification "while" menu item. */
-	34: "it can't move forward repeat",
-	35: "it can move forward repeat",
-	/* Menu items of the "while" clarification submode. */
-	36: "…it can't move forward",
-	37: "…it can move forward",
-	/* Text for input to the editor by menu items "while", "do" and "subroutine". */
-	38: "while ",
-	39: "do ",
-	40: "subroutine ",
-	/* Text for input to the editor for clarification "end" menu item. */
-	41: "of branching",
-	42: "of cycling",
-	43: "of subroutine",
-	/* Menu items of the "end" clarification submode. */
-	44: "…of branching",
-	45: "…of cycling",
-	46: "…of subroutine",
-	/* Text for input to the editor by menu item "end". */
-	47: "the end ",
 	/* Menu items of additional commands programming submode. */
-	48: "if…",
-	49: "otherwise",
-	50: "while…",
-	51: "do",
-	52: "subroutine",
 	53: "the end…",
 	54: "back",
 	/* Confirmation message about the text editor content erase. */
@@ -124,9 +109,6 @@ i18n.strTable.en = {
 	59: "reset",
 	60: "programming",
 	/* Mode №2 menu items. */
-	61: "hop",
-	62: "step",
-	63: "turn",
 	64: "erase",
 	65: "execute",
 	/* Mode №3 menu items. */

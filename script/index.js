@@ -93,7 +93,6 @@ function start ()
 		program.language = i18n.plTree[i18n.language];
 		document.documentElement.setAttribute ("lang", i18n.language);
 		app.title = i18n.string (1000);
-		app.developed = i18n.string (1001) + app.developed;
 		document.title = app.title;
 		document.getElementById ("title").innerText = app.title;
 	}
@@ -481,156 +480,100 @@ function start ()
 	{
 		editor.insert (i18n.string (27) + "\n");
 	}
-	/*-----------------------------*/
-	/* Ввод дополнительных команд. */
-	/*-----------------------------*/
+	/*-------------------------------------------------------*/
+	/* Меню ввода команд в режиме программирования.          */
+	/* После переделки 18.10.2026 г. в языковых файлах       */
+	/* освободились строки с идентификаторами: 25-53, 61-63. */
+	/*-------------------------------------------------------*/
 	function ediCommands ()
 	{
 		var commands;
-		/*-------------------------*/
-		/* Ввод команды "если...". */
-		/*-------------------------*/
-		function ediIf ()
+		/*-------------------------------*/
+		/* Очистка текстового редактора. */
+		/*-------------------------------*/
+		function ediClean ()
 		{
-			var endings;
-			/*----------------------------------------*/
-			/* Ввод завершения "...впереди край, то". */
-			/*----------------------------------------*/
-			function ediIfEdge ()
-			{
-				editor.insert (i18n.string (28) + "\n");
-				menubar.replace (app.modes[1]);
-			}
-			/*--------------------------------------------*/
-			/* Ввод завершения "... впереди не край, то". */
-			/*--------------------------------------------*/
-			function ediIfNotEdge ()
-			{
-				editor.insert (i18n.string (29) + "\n");
-				menubar.replace (app.modes[1]);
-			}
-			endings = [
-				{hotkey: "F1", text: i18n.string (30), handler: ediIfEdge},
-				{hotkey: "F2", text: i18n.string (31), handler: ediIfNotEdge}
-			];
-			editor.insert (i18n.string (32));
-			menubar.replace (endings);
-		}
-		/*-----------------------*/
-		/* Ввод команды "иначе". */
-		/*-----------------------*/
-		function ediElse ()
-		{
-			editor.insert (i18n.string (33) + "\n");
-			menubar.replace (app.modes[1]);			
-		}
-		/*-------------------------*/
-		/* Ввод команды "пока...". */
-		/*-------------------------*/
-		function ediWhile ()
-		{
-			var endings;
-			/*------------------------------------------------*/
-			/* Ввод завершения "... впереди край, повторять". */
-			/*------------------------------------------------*/
-			function ediWhileEdge ()
-			{
-				editor.insert (i18n.string (34) + "\n");
-				menubar.replace (app.modes[1]);
-			}
-			/*---------------------------------------------------*/
-			/* Ввод завершения "... впереди не край, повторять". */
-			/*---------------------------------------------------*/
-			function ediWhileNotEdge ()
-			{
-				editor.insert (i18n.string (35) + "\n");
-				menubar.replace (app.modes[1]);
-			}
-			endings = [
-				{hotkey: "F1", text: i18n.string (36), handler: ediWhileEdge},
-				{hotkey: "F2", text: i18n.string (37), handler: ediWhileNotEdge}
-			];
-			editor.insert (i18n.string (38));
-			menubar.replace (endings);
-		}
-		/*------------------------*/
-		/* Ввод команды "сделай". */
-		/*------------------------*/
-		function ediDo ()
-		{
-			editor.insert (i18n.string (39));
-			menubar.replace (app.modes[1]);
-		}
-		/*---------------------------*/
-		/* Ввод команды "процедура". */
-		/*---------------------------*/
-		function ediProc ()
-		{
-			editor.insert (i18n.string (40));
-			menubar.replace (app.modes[1]);
-		}
-		/*--------------------------*/
-		/* Ввод команды "конец...". */
-		/*--------------------------*/
-		function ediEnd ()
-		{
-			var endings;
-			/*----------------------------------*/
-			/* Ввод завершения "... ветвления". */
-			/*----------------------------------*/
-			function ediEndIf ()
-			{
-				editor.insert (i18n.string (41) + "\n");
-				menubar.replace (app.modes[1]);
-			}
-			/*------------------------------*/
-			/* Ввод завершения "... цикла". */
-			/*------------------------------*/
-			function ediEndWhile ()
-			{
-				editor.insert (i18n.string (42) + "\n");
-				menubar.replace (app.modes[1]);
-			}
-			function ediEndProc ()
-			{
-				editor.insert (i18n.string (43) + "\n");
-				menubar.replace (app.modes[1]);
-			}
-			endings = [
-				{hotkey: "F1", text: i18n.string (44), handler: ediEndIf},
-				{hotkey: "F2", text: i18n.string (45), handler: ediEndWhile},
-				{hotkey: "F3", text: i18n.string (46), handler: ediEndProc}
-			];
-			editor.insert (i18n.string (47));
-			menubar.replace (endings);
+			disableUserInput ();
+			if (window.confirm (i18n.string (55)))
+				editor.clean ();
+			enableUserInput (); 
 		}
 		/*----------------------------------------*/
 		/* Возврат в основной режим ввода команд. */
 		/*----------------------------------------*/
-		function ediBack ()
+		function ediReset ()
 		{
 			menubar.replace (app.modes[1]);
 		}
-		commands = [
-			{hotkey: "F4", text: i18n.string (48), handler: ediIf},
-			{hotkey: "F5", text: i18n.string (49), handler: ediElse},
-			{hotkey: "F6", text: i18n.string (50), handler: ediWhile},
-			{hotkey: "F7", text: i18n.string (51), handler: ediDo},
-			{hotkey: "F8", text: i18n.string (52), handler: ediProc},
-			{hotkey: "F9", text: i18n.string (53), handler: ediEnd},
-			{hotkey: "F10", text: i18n.string (54), handler: ediBack}
-		];
-		menubar.replace (commands);
-	}
-	/*-------------------------------*/
-	/* Очистка текстового редактора. */
-	/*-------------------------------*/
-	function ediClean ()
-	{
-		disableUserInput ();
-		if (window.confirm (i18n.string (55)))
-			editor.clean ();
-		enableUserInput (); 
+		/*-------------------------------------------------------------------*/
+		/* Ввод команды в поле редактирования текста программы.              */
+		/* Вызов: s - текст команды, который будет введён в текущую позицию. */
+		/* Последний символ строки s может быть управляющим:                 */
+		/* 	< - после ввода текста установить курсор в начало строки,    */
+		/*      . - после ввода текста перевести строку,                     */
+		/*      > - после ввода текста установить курсор в конец строки и    */
+		/*          перевести строку.                                        */
+		/*-------------------------------------------------------------------*/
+		function ediInsert (s) {
+			var ce = s.substr (-1, 1);
+			if ("<.>".indexOf (ce) != -1) {
+				editor.insert (s.substr (0, s.length - 1));
+				switch (ce) {
+					case "<": /* установка на начало строки */
+						editor.toBOL ();
+						break;
+					case ">": /* установка на конец строки */
+						editor.toEOL ();
+					case ".": /* перевод строки */
+						editor.insert ("\n");
+				}
+			}
+			else
+				editor.insert (s);
+		}
+		/*------------------------------------*/
+		/* Формирование меню текущего уровня. */
+		/*------------------------------------*/
+		function ediMenuCommands (menutree, menulevel) {
+			var menuitem, miHotkey, miText, miHandler, commands = new Array ();
+			for (menuitem in menutree) {
+				miHotkey = menuitem;
+				if (typeof (menutree[menuitem]) == "string") {
+					/* пункт меню */
+					s = menutree[menuitem].split ("^");
+					miText = s[0];
+					miHandler = function (txt, submenulevel) { return function () {
+						/* ediInsert (txt.substr (-1, 1) == "?"? txt.substr (0, txt.length - 1): txt + "\n"); */
+						ediInsert (txt);
+						if (submenulevel > 0)
+							ediReset ();
+					}; } (s[1]? s[1]: s[0], menulevel);
+				}
+				else {
+					/* подменю */
+					s = menutree[menuitem][0].split ("^");
+					miText = s[0];
+					miHandler = function (txt, submenutree, submenulevel) { return function () {
+						if (txt != " ")
+							ediInsert (txt);
+						menubar.replace (ediMenuCommands (submenutree, submenulevel));
+					}; } (s[1]? s[1]: s[0], menutree[menuitem][1], menulevel + 1);
+				}
+				commands.push ({"hotkey": miHotkey, "text": miText, "handler": miHandler})
+			}
+			switch (menulevel) {
+				case 0: /* начальное меню. */
+					commands.push ({"hotkey": "ESC", "text": i18n.string (64), "handler": ediClean});
+					commands.push ({"hotkey": "TAB", "text": i18n.string (65), "handler": switchMode3});
+					break;
+				case 1: /* подменю первого уровня. */
+					commands.push ({"hotkey": "F10", "text": i18n.string (54), "handler": ediReset});
+					break;
+			}
+			return commands;
+		}
+		var edTree = i18n.edTree[i18n.language], menulevel = 0;
+		return ediMenuCommands (edTree, menulevel);
 	}
 	/*--------------------------------------------------------------------------*/
 	/* Позиционирование исполнителя после изменения размеров окна веб-браузера. */
@@ -803,10 +746,9 @@ function start ()
 	/*--------------------------------------------*/
 	function displayAboutBox ()
 	{
-		var appInfo = i18n.string (1002) + app.title + ", " + i18n.string (1003) + app.version,
-		devInfo = i18n.string (1004) + app.developed;
+		var appInfo = i18n.string (1001, i18n.string (1000), app.version);
 		app.soundPlay ("AppInit");
-		window.setTimeout (function () {window.alert (appInfo + "\n" + devInfo)}, 100);
+		window.setTimeout (function () {window.alert (appInfo)}, 100);
 	}
 	/*-------------------------------------*/
 	/* Исполняеме команды функции Start... */
@@ -823,14 +765,7 @@ function start ()
 		{hotkey: "TAB", text: i18n.string (60), handler: switchMode2}
 	],
 	/* 1 - Режим программирования. */
-	[
-		{hotkey: "F1", text: i18n.string (61), handler: ediHop},
-		{hotkey: "F2", text: i18n.string (62), handler: ediStep},
-		{hotkey: "F3", text: i18n.string (63), handler: ediTurn},
-		{hotkey: "F4", text: "…", handler: ediCommands},
-		{hotkey: "ESC", text: i18n.string (64), handler: ediClean},
-		{hotkey: "TAB", text: i18n.string (65), handler: switchMode3}
-	],
+	ediCommands (),
 	/* 2 - Режим выполнения программы. */
 	[
 		{hotkey: "F1", text: i18n.string (66), handler: prgStartNormal},

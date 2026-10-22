@@ -41,6 +41,28 @@ editor.clean = function ()
 	this.elem.value = "";
 	this.elem.focus ();
 };
+/*========================================================================*/
+/* Метод объекта "редактор" - установка курсора на начало текущей строки. */
+/*========================================================================*/
+editor.toBOL = function ()
+{
+	var p, pb;
+	this.elem.focus ();
+	p = this.elem.selectionStart;
+	pb = this.elem.value.lastIndexOf ("\n", this.elem.value.charAt (p) == "\n"? p - 1: p);
+	this.elem.selectionStart = this.elem.selectionEnd = pb > -1? pb + 1: 0;
+};
+/*=======================================================================*/
+/* Метод объекта "редактор" - установка курсора на конец текущей строки. */
+/*=======================================================================*/
+editor.toEOL = function ()
+{
+	var p, pe;
+	this.elem.focus ();
+	p = this.elem.selectionEnd;
+	pe = this.elem.value.indexOf ("\n", p);
+	this.elem.selectionStart = this.elem.selectionEnd = pe > -1? pe: this.elem.value.length;
+}
 /*=======================================================================*/
 /* Метод объекта "редактор" - вставка текста в текущую позицию.          */
 /* Вызов: text - вставляемый текст.                                      */
